@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useAuth } from '../../auth/hook/useAuth'
+import { useChat } from '../hooks/useChat'
 
 const Dashboard = () => {
   const { user, loading, handleGetMe } = useAuth()
   const [checking, setChecking] = useState(true)
   const navigate = useNavigate()
+  const chat = useChat();
 
   useEffect(() => {
     if (user) {
@@ -20,6 +22,10 @@ const Dashboard = () => {
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    chat.initializeSocketConnection()
   }, [])
 
   if (checking || loading) {
