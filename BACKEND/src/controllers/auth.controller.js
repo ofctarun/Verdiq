@@ -116,6 +116,21 @@ export async function login(req, res) {
 
 
 /**
+ * @desc Log out the current user
+ * @route POST /api/auth/logout
+ * @access Private
+ */
+export async function logout(req, res) {
+    res.clearCookie("token");
+
+    res.status(200).json({
+        message: "Logged out successfully",
+        success: true
+    })
+}
+
+
+/**
  * @desc Get current logged in user's details
  * @route GET /api/auth/get-me
  * @access Private

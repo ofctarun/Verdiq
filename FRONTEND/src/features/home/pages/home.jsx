@@ -1,4 +1,7 @@
-import { Link } from 'react-router'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router'
+import { useAuth } from '../../auth/hook/useAuth'
+import { useChat } from '../../chat/hooks/useChat'
 
 const FEATURES = [
   {
@@ -16,23 +19,62 @@ const FEATURES = [
 ]
 
 const Home = () => {
+  const { user, loading } = useAuth()
+  const chat = useChat()
+  const navigate = useNavigate()
+  const [question, setQuestion] = useState('')
+
+  const handleAsk = async (e) => {
+    e.preventDefault()
+    const message = question.trim()
+    if (!message || chat.sending) return
+
+    if (!user) {
+      navigate('/login')
+      return
+    }
+
+    chat.handleStartNewChat()
+    setQuestion('')
+
+    const success = await chat.handleSendMessage(message)
+    if (success) {
+      navigate('/')
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white text-black">
       <header className="flex items-center justify-between border-b border-neutral-200 px-6 py-4 sm:px-10">
-        <span className="text-lg font-semibold tracking-tight">Perplexity</span>
+        <Link to="/home" className="text-lg font-semibold tracking-tight">
+          Perplexity
+        </Link>
         <nav className="flex items-center gap-3">
-          <Link
-            to="/login"
-            className="rounded-lg px-4 py-2 text-sm font-medium text-black transition hover:bg-neutral-100"
-          >
-            Sign in
-          </Link>
-          <Link
-            to="/register"
-            className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-neutral-800"
-          >
-            Get started
-          </Link>
+          {loading ? (
+            <div className="h-9 w-28 animate-pulse rounded-lg bg-neutral-100" />
+          ) : user ? (
+            <Link
+              to="/"
+              className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-neutral-800"
+            >
+              Go to chats
+            </Link>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-black transition hover:bg-neutral-100"
+              >
+                Sign in
+              </Link>
+              <Link
+                to="/register"
+                className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-neutral-800"
+              >
+                Get started
+              </Link>
+            </>
+          )}
         </nav>
       </header>
 
@@ -46,19 +88,26 @@ const Home = () => {
           </p>
         </div>
 
-        <form className="mx-auto mt-10 flex max-w-2xl items-center gap-2 rounded-2xl border border-neutral-200 p-2 shadow-sm transition focus-within:border-black">
+        <form
+          onSubmit={handleAsk}
+          className="mx-auto mt-10 flex max-w-2xl items-center gap-2 rounded-2xl border border-neutral-200 p-2 shadow-sm transition focus-within:border-black"
+        >
           <input
             type="text"
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
             placeholder="Ask anything…"
             className="w-full bg-transparent px-3 py-2.5 text-sm text-black placeholder:text-neutral-400 outline-none"
           />
           <button
             type="submit"
-            className="shrink-0 rounded-xl bg-black px-5 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-800"
+            disabled={chat.sending || !question.trim()}
+            className="shrink-0 rounded-xl bg-black px-5 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Ask
+            {chat.sending ? 'Asking…' : 'Ask'}
           </button>
         </form>
+        {chat.error && <p className="mt-3 text-center text-sm text-red-600">{chat.error}</p>}
 
         <div className="mt-20 grid gap-6 sm:grid-cols-3">
           {FEATURES.map((feature) => (

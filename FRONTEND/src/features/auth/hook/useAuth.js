@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
-import { register, login, getMe } from "../service/auth.api";
+import { register, login, getMe, logout } from "../service/auth.api";
 import { setUser, setLoading, setError } from "../auth.slice";
+import { resetChat } from "../../chat/chat.slice";
 
 export function useAuth() {
 
@@ -50,6 +51,15 @@ export function useAuth() {
         }
     }
 
+    async function handleLogout() {
+        try {
+            await logout()
+        } finally {
+            dispatch(setUser(null))
+            dispatch(resetChat())
+        }
+    }
+
     return {
         user,
         loading,
@@ -57,6 +67,7 @@ export function useAuth() {
         handleRegister,
         handleLogin,
         handleGetMe,
+        handleLogout,
     }
 
 }
