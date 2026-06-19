@@ -1,5 +1,6 @@
 import { io } from "socket.io-client";
 import { store } from "../../../app/app.store";
+import { API_BASE_URL } from "../../../config/api.config";
 import { resolveDraftChat, addMessage, setSending, setError } from "../chat.slice";
 
 let socket = null;
@@ -30,7 +31,7 @@ function attachListeners(s) {
 
 function getSocket() {
     if (!socket) {
-        socket = io("http://localhost:3000", {
+        socket = io(API_BASE_URL, {
             withCredentials: true,
         })
         attachListeners(socket)

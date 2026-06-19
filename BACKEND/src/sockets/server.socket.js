@@ -1,16 +1,14 @@
 import { Server } from "socket.io";
 import { authenticateSocket } from "./socket.auth.js";
 import { registerChatHandlers } from "./chat.socket.js";
+import { corsOptions } from "../config/cors.config.js";
 
 
 let io;
 
 export function initSocket(httpServer) {
     io = new Server(httpServer, {
-        cors: {
-            origin: "http://localhost:5173",
-            credentials: true,
-        }
+        cors: corsOptions
     })
 
     io.use(authenticateSocket)
