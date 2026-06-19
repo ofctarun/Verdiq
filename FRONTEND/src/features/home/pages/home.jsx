@@ -24,7 +24,7 @@ const Home = () => {
   const navigate = useNavigate()
   const [question, setQuestion] = useState('')
 
-  const handleAsk = async (e) => {
+  const handleAsk = (e) => {
     e.preventDefault()
     const message = question.trim()
     if (!message || chat.sending) return
@@ -36,11 +36,8 @@ const Home = () => {
 
     chat.handleStartNewChat()
     setQuestion('')
-
-    const success = await chat.handleSendMessage(message)
-    if (success) {
-      navigate('/')
-    }
+    chat.handleSendMessage(message)
+    navigate('/')
   }
 
   return (

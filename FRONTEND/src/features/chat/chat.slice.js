@@ -4,6 +4,7 @@ const initialState = {
     chats: [],
     messagesByChat: {},
     currentChatId: null,
+    draftMessages: [],
     loading: false,
     sending: false,
     error: null,
@@ -27,6 +28,19 @@ const chatSlice = createSlice({
         },
         setCurrentChatId: (state, action) => {
             state.currentChatId = action.payload
+        },
+        addDraftMessage: (state, action) => {
+            state.draftMessages.push(action.payload)
+        },
+        clearDraftMessages: (state) => {
+            state.draftMessages = []
+        },
+        resolveDraftChat: (state, action) => {
+            const chat = action.payload
+            state.chats.unshift(chat)
+            state.currentChatId = chat._id
+            state.messagesByChat[chat._id] = state.draftMessages
+            state.draftMessages = []
         },
         setMessages: (state, action) => {
             const { chatId, messages } = action.payload
@@ -57,6 +71,9 @@ export const {
     addChat,
     removeChat,
     setCurrentChatId,
+    addDraftMessage,
+    clearDraftMessages,
+    resolveDraftChat,
     setMessages,
     addMessage,
     setLoading,

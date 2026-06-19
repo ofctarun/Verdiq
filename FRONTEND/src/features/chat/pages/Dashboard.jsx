@@ -37,19 +37,19 @@ const Dashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checking])
 
-  const messages = chat.currentChatId ? chat.messagesByChat[chat.currentChatId] || [] : []
+  const messages = chat.currentChatId ? chat.messagesByChat[chat.currentChatId] || [] : chat.draftMessages
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages.length, chat.sending])
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
     const message = input.trim()
     if (!message || chat.sending) return
 
     setInput('')
-    await chat.handleSendMessage(message)
+    chat.handleSendMessage(message)
   }
 
   const handleKeyDown = (e) => {

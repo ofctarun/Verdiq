@@ -1,4 +1,6 @@
 import { Server } from "socket.io";
+import { authenticateSocket } from "./socket.auth.js";
+import { registerChatHandlers } from "./chat.socket.js";
 
 
 let io;
@@ -11,10 +13,13 @@ export function initSocket(httpServer) {
         }
     })
 
+    io.use(authenticateSocket)
+
     console.log("Socket.io server is RUNNING")
 
     io.on("connection", (socket) => {
         console.log("A user connected: " + socket.id)
+        registerChatHandlers(socket)
     })
 }
 
