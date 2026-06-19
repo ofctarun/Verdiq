@@ -1,6 +1,7 @@
 import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../services/mail.service.js";
+import { cookieOptions } from "../config/cookie.config.js";
 
 
 /**
@@ -100,7 +101,7 @@ export async function login(req, res) {
         username: user.username,
     }, process.env.JWT_SECRET, { expiresIn: '7d' })
 
-    res.cookie("token", token)
+    res.cookie("token", token, cookieOptions)
 
     res.status(200).json({
         message: "Login successful",
@@ -121,7 +122,7 @@ export async function login(req, res) {
  * @access Private
  */
 export async function logout(req, res) {
-    res.clearCookie("token");
+    res.clearCookie("token", cookieOptions);
 
     res.status(200).json({
         message: "Logged out successfully",
