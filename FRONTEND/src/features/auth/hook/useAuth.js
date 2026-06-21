@@ -43,8 +43,8 @@ export function useAuth() {
             const data = await getMe()
             dispatch(setUser(data.user))
             return true
-        } catch (err) {
-            dispatch(setError(err.response?.data?.message || "Failed to fetch user data"))
+        } catch {
+            // not logged in yet is the expected outcome here, not a user-facing error
             return false
         } finally {
             dispatch(setLoading(false))

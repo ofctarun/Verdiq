@@ -37,7 +37,7 @@ const Home = () => {
     chat.handleStartNewChat()
     setQuestion('')
     chat.handleSendMessage(message)
-    navigate('/')
+    navigate('/dashboard')
   }
 
   return (
@@ -51,7 +51,7 @@ const Home = () => {
             <div className="h-9 w-28 animate-pulse rounded-lg bg-neutral-100" />
           ) : user ? (
             <Link
-              to="/"
+              to="/dashboard"
               className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-neutral-800"
             >
               Go to chats

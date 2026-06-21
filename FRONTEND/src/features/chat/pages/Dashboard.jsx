@@ -68,7 +68,7 @@ const Dashboard = () => {
       setGithubNotice('Failed to connect GitHub. Please try again.')
     }
 
-    navigate('/', { replace: true })
+    navigate('/dashboard', { replace: true })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

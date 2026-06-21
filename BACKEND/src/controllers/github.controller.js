@@ -33,7 +33,7 @@ export async function callback(req, res) {
         }
         userId = decoded.userId;
     } catch (err) {
-        return res.redirect(`${clientUrl}/?github=error`);
+        return res.redirect(`${clientUrl}/dashboard?github=error`);
     }
 
     try {
@@ -54,7 +54,7 @@ export async function callback(req, res) {
         const tokenData = await tokenRes.json();
 
         if (!tokenData.access_token) {
-            return res.redirect(`${clientUrl}/?github=error`);
+            return res.redirect(`${clientUrl}/dashboard?github=error`);
         }
 
         const profileRes = await fetch("https://api.github.com/user", {
@@ -74,10 +74,10 @@ export async function callback(req, res) {
             githubConnectedAt: new Date(),
         });
 
-        return res.redirect(`${clientUrl}/?github=connected`);
+        return res.redirect(`${clientUrl}/dashboard?github=connected`);
     } catch (err) {
         console.error("GitHub OAuth callback failed:", err);
-        return res.redirect(`${clientUrl}/?github=error`);
+        return res.redirect(`${clientUrl}/dashboard?github=error`);
     }
 }
 
