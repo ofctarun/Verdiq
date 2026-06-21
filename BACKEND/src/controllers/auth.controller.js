@@ -34,18 +34,22 @@ export async function register(req, res) {
 
     const backendUrl = process.env.BACKEND_URL || "http://localhost:3000";
 
-    await sendEmail({
-        to: email,
-        subject: "Welcome to Verdiq!",
-        html: `
-                <p>Hi ${username},</p>
-                <p>Thank you for registering at <strong>Verdiq</strong>. We're excited to have you on board!</p>
-                <p>Please verify your email address by clicking the link below:</p>
-                <a href="${backendUrl}/api/auth/verify-email?token=${emailVerificationToken}">Verify Email</a>
-                <p>If you did not create an account, please ignore this email.</p>
-                <p>Best regards,<br>The Verdiq Team</p>
-        `
-    })
+    try {
+        await sendEmail({
+            to: email,
+            subject: "Welcome to Verdiq!",
+            html: `
+                    <p>Hi ${username},</p>
+                    <p>Thank you for registering at <strong>Verdiq</strong>. We're excited to have you on board!</p>
+                    <p>Please verify your email address by clicking the link below:</p>
+                    <a href="${backendUrl}/api/auth/verify-email?token=${emailVerificationToken}">Verify Email</a>
+                    <p>If you did not create an account, please ignore this email.</p>
+                    <p>Best regards,<br>The Verdiq Team</p>
+            `
+        })
+    } catch (err) {
+        console.error("Failed to send verification email for", email, ":", err.message);
+    }
 
     res.status(201).json({
         message: "User registered successfully",
