@@ -16,6 +16,15 @@ const messageSchema = new mongoose.Schema(
       enum: ['user', 'ai'],
       required: true,
     },
+    toolsUsed: {
+      type: [
+        {
+          tool: { type: String, enum: ['web_search', 'github', 'calculator'] },
+          summary: { type: String },
+        },
+      ],
+      default: [],
+    },
   },
   { timestamps: true }
 );

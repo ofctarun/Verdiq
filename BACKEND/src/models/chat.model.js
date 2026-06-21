@@ -12,6 +12,27 @@ const chatSchema = new mongoose.Schema(
       default: 'New Chat',
       trim: true,
     },
+    activeTools: {
+      type: [String],
+      enum: ['web_search', 'github', 'calculator'],
+      default: ['web_search'],
+    },
+    systemPrompt: {
+      type: String,
+      default: '',
+      maxlength: 500,
+      trim: true,
+    },
+    attachments: {
+      type: [
+        {
+          filename: { type: String, required: true },
+          textContent: { type: String, required: true },
+          uploadedAt: { type: Date, default: Date.now },
+        },
+      ],
+      default: [],
+    },
   },
   { timestamps: true }
 );

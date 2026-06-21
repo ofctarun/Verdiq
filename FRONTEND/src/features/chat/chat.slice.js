@@ -42,6 +42,19 @@ const chatSlice = createSlice({
             state.messagesByChat[chat._id] = state.draftMessages
             state.draftMessages = []
         },
+        setChatConfig: (state, action) => {
+            const { chatId, activeTools, systemPrompt } = action.payload
+            const chat = state.chats.find((c) => c._id === chatId)
+            if (!chat) return
+            if (activeTools !== undefined) chat.activeTools = activeTools
+            if (systemPrompt !== undefined) chat.systemPrompt = systemPrompt
+        },
+        setChatAttachments: (state, action) => {
+            const { chatId, attachments } = action.payload
+            const chat = state.chats.find((c) => c._id === chatId)
+            if (!chat) return
+            chat.attachments = attachments
+        },
         setMessages: (state, action) => {
             const { chatId, messages } = action.payload
             state.messagesByChat[chatId] = messages
@@ -74,6 +87,8 @@ export const {
     addDraftMessage,
     clearDraftMessages,
     resolveDraftChat,
+    setChatConfig,
+    setChatAttachments,
     setMessages,
     addMessage,
     setLoading,

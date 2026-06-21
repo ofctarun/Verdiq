@@ -25,6 +25,23 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        githubId: {
+            type: String,
+            default: null,
+        },
+        githubUsername: {
+            type: String,
+            default: null,
+        },
+        githubAccessToken: {
+            type: String,
+            default: null,
+            select: false,
+        },
+        githubConnectedAt: {
+            type: Date,
+            default: null,
+        },
     },
     { timestamps: true }
 );

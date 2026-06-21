@@ -6,6 +6,7 @@ const authSlice = createSlice({
     user: null,
     loading: true,
     error: null,
+    github: { connected: false, username: null },
   },
   reducers: {
     setUser : (state, action)  => {
@@ -17,9 +18,12 @@ const authSlice = createSlice({
     setError : (state, action) => {
       state.error = action.payload;
     },
+    setGithubStatus : (state, action) => {
+      state.github = action.payload;
+    },
   },
 });
 
-export const { setUser, setLoading, setError } = authSlice.actions;
+export const { setUser, setLoading, setError, setGithubStatus } = authSlice.actions;
 
 export default authSlice.reducer;

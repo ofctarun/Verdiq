@@ -1,5 +1,5 @@
 {
-  "name": "perplexity",
+  "name": "verdiq",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,16 +9,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ofctarun/perplexity.git"
+    "url": "git+https://github.com/ofctarun/Verdiq.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "bugs": {
-    "url": "https://github.com/ofctarun/perplexity/issues"
+    "url": "https://github.com/ofctarun/Verdiq/issues"
   },
-  "homepage": "https://github.com/ofctarun/perplexity#readme",
+  "homepage": "https://github.com/ofctarun/Verdiq#readme",
   "dependencies": {
     "@langchain/core": "^1.2.0",
     "@langchain/google-genai": "^2.1.31",
@@ -33,10 +33,13 @@
     "express-validator": "^7.3.2",
     "jsonwebtoken": "^9.0.3",
     "langchain": "^1.4.5",
+    "mathjs": "^15.2.0",
     "mongoose": "^9.7.0",
     "morgan": "^1.11.0",
+    "multer": "^2.2.0",
     "nodemailer": "^9.0.1",
     "nodemon": "^3.1.14",
+    "pdf-parse": "^2.4.5",
     "socket.io": "^4.8.3",
     "zod": "^4.4.3"
   }

@@ -1,12 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
 import { register, login, getMe, logout } from "../service/auth.api";
-import { setUser, setLoading, setError } from "../auth.slice";
+import { setUser, setLoading, setError, setGithubStatus } from "../auth.slice";
 import { resetChat } from "../../chat/chat.slice";
 
 export function useAuth() {
 
     const dispatch = useDispatch()
-    const { user, loading, error } = useSelector((state) => state.auth)
+    const { user, loading, error, github } = useSelector((state) => state.auth)
 
     async function handleRegister({ email, username, password }) {
         try {
@@ -57,6 +57,7 @@ export function useAuth() {
         } finally {
             dispatch(setUser(null))
             dispatch(resetChat())
+            dispatch(setGithubStatus({ connected: false, username: null }))
         }
     }
 
@@ -64,6 +65,7 @@ export function useAuth() {
         user,
         loading,
         error,
+        github,
         handleRegister,
         handleLogin,
         handleGetMe,

@@ -44,7 +44,7 @@ const Home = () => {
     <div className="min-h-screen bg-white text-black">
       <header className="flex items-center justify-between border-b border-neutral-200 px-6 py-4 sm:px-10">
         <Link to="/home" className="text-lg font-semibold tracking-tight">
-          Perplexity
+          Verdiq
         </Link>
         <nav className="flex items-center gap-3">
           {loading ? (
@@ -120,7 +120,7 @@ const Home = () => {
       </main>
 
       <footer className="border-t border-neutral-200 px-6 py-6 text-center text-sm text-neutral-400 sm:px-10">
-        © {new Date().getFullYear()} Perplexity
+        © {new Date().getFullYear()} Verdiq
       </footer>
     </div>
   )

@@ -2,14 +2,32 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { useAuth } from '../../auth/hook/useAuth'
 import { useChat } from '../hooks/useChat'
+import { useGithub } from '../../github/hooks/useGithub'
+
+const TOOL_OPTIONS = [
+  { key: 'web_search', label: 'Web Search', emoji: '🔍' },
+  { key: 'github', label: 'GitHub', emoji: '🐙' },
+  { key: 'calculator', label: 'Calculator', emoji: '🧮' },
+]
+
+const TOOL_META = TOOL_OPTIONS.reduce((acc, t) => {
+  acc[t.key] = t
+  return acc
+}, {})
 
 const Dashboard = () => {
   const { user, loading, handleGetMe, handleLogout } = useAuth()
   const [checking, setChecking] = useState(true)
   const navigate = useNavigate()
   const chat = useChat();
+  const github = useGithub();
   const [input, setInput] = useState('')
+  const [showSettings, setShowSettings] = useState(false)
+  const [personaDraft, setPersonaDraft] = useState('')
+  const [githubNotice, setGithubNotice] = useState('')
+  const [uploading, setUploading] = useState(false)
   const bottomRef = useRef(null)
+  const fileInputRef = useRef(null)
 
   useEffect(() => {
     if (user) {
@@ -33,15 +51,39 @@ const Dashboard = () => {
   useEffect(() => {
     if (!checking) {
       chat.handleGetChats()
+      github.handleRefreshStatus()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checking])
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const githubParam = params.get('github')
+    if (!githubParam) return
+
+    if (githubParam === 'connected') {
+      github.handleRefreshStatus()
+      setGithubNotice('GitHub connected successfully.')
+    } else if (githubParam === 'error') {
+      setGithubNotice('Failed to connect GitHub. Please try again.')
+    }
+
+    navigate('/', { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const currentChat = chat.chats.find((c) => c._id === chat.currentChatId)
   const messages = chat.currentChatId ? chat.messagesByChat[chat.currentChatId] || [] : chat.draftMessages
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages.length, chat.sending])
+
+  useEffect(() => {
+    setPersonaDraft(currentChat?.systemPrompt || '')
+    setShowSettings(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chat.currentChatId])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -59,6 +101,42 @@ const Dashboard = () => {
     }
   }
 
+  const handleToggleTool = (toolKey) => {
+    if (!currentChat) return
+
+    if (toolKey === 'github' && !github.github.connected) {
+      github.connect()
+      return
+    }
+
+    const active = currentChat.activeTools || []
+    const next = active.includes(toolKey)
+      ? active.filter((t) => t !== toolKey)
+      : [...active, toolKey]
+
+    chat.handleUpdateChatConfig(currentChat._id, { activeTools: next })
+  }
+
+  const handleSavePersona = () => {
+    if (!currentChat) return
+    chat.handleUpdateChatConfig(currentChat._id, { systemPrompt: personaDraft })
+    setShowSettings(false)
+  }
+
+  const handleAttachClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file || !currentChat) return
+
+    setUploading(true)
+    await chat.handleUploadAttachment(currentChat._id, file)
+    setUploading(false)
+  }
+
   if (checking || loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
@@ -72,7 +150,7 @@ const Dashboard = () => {
       <aside className="flex w-64 flex-col border-r border-neutral-200">
         <div className="border-b border-neutral-200 p-4">
           <Link to="/home" className="text-lg font-semibold tracking-tight">
-            Perplexity
+            Verdiq
           </Link>
           <button
             type="button"
@@ -112,24 +190,134 @@ const Dashboard = () => {
           ))}
         </div>
 
-        <div className="flex items-center justify-between border-t border-neutral-200 p-4 text-sm text-neutral-500">
-          <span>{user?.username}</span>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="text-xs font-medium text-neutral-500 transition hover:text-black"
-          >
-            Log out
-          </button>
+        <div className="border-t border-neutral-200 p-4 text-sm">
+          {github.github.connected ? (
+            <div className="flex items-center justify-between">
+              <span className="text-neutral-500">🐙 @{github.github.username}</span>
+              <button
+                type="button"
+                onClick={github.handleDisconnect}
+                className="text-xs font-medium text-neutral-400 transition hover:text-red-600"
+              >
+                Disconnect
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={github.connect}
+              className="w-full rounded-lg border border-neutral-200 py-1.5 text-xs font-medium transition hover:border-black"
+            >
+              🐙 Connect GitHub
+            </button>
+          )}
+
+          <div className="mt-3 flex items-center justify-between">
+            <span className="text-neutral-500">{user?.username}</span>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="text-xs font-medium text-neutral-500 transition hover:text-black"
+            >
+              Log out
+            </button>
+          </div>
         </div>
       </aside>
 
       <main className="flex flex-1 flex-col">
-        <header className="flex items-center border-b border-neutral-200 px-6 py-4">
-          <h1 className="text-sm font-medium text-neutral-600">
-            {chat.chats.find((c) => c._id === chat.currentChatId)?.title || 'New chat'}
-          </h1>
+        <header className="flex items-center justify-between border-b border-neutral-200 px-6 py-4">
+          <h1 className="text-sm font-medium text-neutral-600">{currentChat?.title || 'New chat'}</h1>
+
+          {currentChat && (
+            <button
+              type="button"
+              onClick={() => setShowSettings((v) => !v)}
+              className="text-xs font-medium text-neutral-500 transition hover:text-black"
+            >
+              ⚙ Settings
+            </button>
+          )}
         </header>
+
+        {githubNotice && (
+          <div className="flex items-center justify-between border-b border-neutral-200 bg-neutral-50 px-6 py-2 text-xs text-neutral-600">
+            <span>{githubNotice}</span>
+            <button type="button" onClick={() => setGithubNotice('')} className="text-neutral-400 hover:text-black">
+              ✕
+            </button>
+          </div>
+        )}
+
+        {currentChat && (
+          <div className="flex items-center gap-2 border-b border-neutral-200 px-6 py-3">
+            {TOOL_OPTIONS.map((toolOption) => {
+              const active = (currentChat.activeTools || []).includes(toolOption.key)
+              const isGithubLocked = toolOption.key === 'github' && !github.github.connected
+
+              return (
+                <button
+                  key={toolOption.key}
+                  type="button"
+                  onClick={() => handleToggleTool(toolOption.key)}
+                  className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                    isGithubLocked
+                      ? 'border-dashed border-neutral-300 text-neutral-400 hover:border-black'
+                      : active
+                        ? 'border-black bg-black text-white'
+                        : 'border-neutral-200 text-neutral-500 hover:border-black'
+                  }`}
+                >
+                  {toolOption.emoji} {isGithubLocked ? 'Connect GitHub' : toolOption.label}
+                </button>
+              )
+            })}
+          </div>
+        )}
+
+        {currentChat?.attachments?.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 border-b border-neutral-200 px-6 py-3">
+            {currentChat.attachments.map((a) => (
+              <span
+                key={a._id}
+                className="flex items-center gap-1.5 rounded-full border border-neutral-200 px-3 py-1 text-xs text-neutral-600"
+              >
+                📄 {a.filename}
+                <button
+                  type="button"
+                  onClick={() => chat.handleDeleteAttachment(currentChat._id, a._id)}
+                  className="text-neutral-400 transition hover:text-red-600"
+                >
+                  ✕
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+
+        {showSettings && currentChat && (
+          <div className="border-b border-neutral-200 bg-neutral-50 px-6 py-4">
+            <label className="text-xs font-medium text-neutral-600">Persona / system prompt</label>
+            <textarea
+              value={personaDraft}
+              onChange={(e) => setPersonaDraft(e.target.value)}
+              maxLength={500}
+              rows={3}
+              placeholder="e.g. Answer like a senior backend engineer, be terse."
+              className="mt-2 w-full rounded-lg border border-neutral-200 p-2 text-sm outline-none focus:border-black"
+            />
+            <div className="mt-2 flex items-center justify-between">
+              <span className="text-xs text-neutral-400">{personaDraft.length}/500</span>
+              <button
+                type="button"
+                onClick={handleSavePersona}
+                className="rounded-lg bg-black px-4 py-1.5 text-xs font-medium text-white transition hover:bg-neutral-800"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="scrollbar-hide flex-1 overflow-y-auto px-6 py-6">
           {messages.length === 0 ? (
@@ -142,7 +330,20 @@ const Dashboard = () => {
           ) : (
             <div className="mx-auto max-w-2xl space-y-4">
               {messages.map((message, i) => (
-                <div key={message._id || i} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div key={message._id || i} className={`flex flex-col ${message.role === 'user' ? 'items-end' : 'items-start'}`}>
+                  {message.role === 'ai' && message.toolsUsed?.length > 0 && (
+                    <div className="mb-1 flex gap-1.5">
+                      {message.toolsUsed.map((t, idx) => (
+                        <span
+                          key={idx}
+                          title={t.summary}
+                          className="rounded-full border border-neutral-200 px-2 py-0.5 text-[10px] text-neutral-500"
+                        >
+                          {TOOL_META[t.tool]?.emoji} {TOOL_META[t.tool]?.label || t.tool}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   <p
                     className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm ${
                       message.role === 'user'
@@ -174,6 +375,22 @@ const Dashboard = () => {
 
         <form onSubmit={handleSubmit} className="border-t border-neutral-200 p-4">
           <div className="mx-auto flex max-w-2xl items-end gap-2 rounded-2xl border border-neutral-200 p-2 transition focus-within:border-black">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="application/pdf"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={handleAttachClick}
+              disabled={!currentChat || uploading || (currentChat?.attachments?.length || 0) >= 3}
+              title={!currentChat ? 'Send a message first to start this chat' : 'Attach a PDF'}
+              className="shrink-0 rounded-xl px-3 py-2.5 text-sm text-neutral-500 transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {uploading ? '…' : '📎'}
+            </button>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}

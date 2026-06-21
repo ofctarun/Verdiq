@@ -2,6 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.router.js";
 import chatRouter from "./routes/chat.routes.js";
+import githubRouter from "./routes/github.routes.js";
 import morgan from "morgan";
 import cors from "cors";
 import { corsOptions } from "./config/cors.config.js";
@@ -20,6 +21,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRouter);
 app.use("/api/chats", chatRouter);
+app.use("/api/github", githubRouter);
 
 
 export default app;
