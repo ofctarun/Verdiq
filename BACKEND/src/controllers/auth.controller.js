@@ -32,6 +32,8 @@ export async function register(req, res) {
         email: user.email,
     }, process.env.JWT_SECRET)
 
+    const backendUrl = process.env.BACKEND_URL || "http://localhost:3000";
+
     await sendEmail({
         to: email,
         subject: "Welcome to Verdiq!",
@@ -39,7 +41,7 @@ export async function register(req, res) {
                 <p>Hi ${username},</p>
                 <p>Thank you for registering at <strong>Verdiq</strong>. We're excited to have you on board!</p>
                 <p>Please verify your email address by clicking the link below:</p>
-                <a href="http://localhost:3000/api/auth/verify-email?token=${emailVerificationToken}">Verify Email</a>
+                <a href="${backendUrl}/api/auth/verify-email?token=${emailVerificationToken}">Verify Email</a>
                 <p>If you did not create an account, please ignore this email.</p>
                 <p>Best regards,<br>The Verdiq Team</p>
         `
@@ -186,11 +188,13 @@ export async function verifyEmail(req, res) {
 
         await user.save();
 
+        const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+
         const html =
             `
         <h1>Email Verified Successfully!</h1>
         <p>Your email has been verified. You can now log in to your account.</p>
-        <a href="http://localhost:3000/login">Go to Login</a>
+        <a href="${clientUrl}/login">Go to Login</a>
     `
 
         return res.send(html);
