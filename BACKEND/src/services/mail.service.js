@@ -23,8 +23,9 @@ async function getTransporter() {
 
     return nodemailer.createTransport({
         host: ip,
-        port: 465,
-        secure: true,
+        port: 587,
+        secure: false,
+        requireTLS: true,
         tls: {
             servername: "smtp.gmail.com",
         },
