@@ -21,7 +21,7 @@ const AuthLayout = ({ heading, subheading, children, footer }) => (
         />
       </svg>
 
-      <Link to="/home" className="text-lg font-semibold tracking-tight">
+      <Link to="/home" className="text-lg font-bold tracking-tight">
         Verdiq
       </Link>
 
@@ -30,7 +30,7 @@ const AuthLayout = ({ heading, subheading, children, footer }) => (
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: EASE }}
-          className="text-4xl font-semibold tracking-tight"
+          className="text-4xl font-extrabold tracking-tight"
         >
           Ask anything.
           <br />
@@ -51,7 +51,7 @@ const AuthLayout = ({ heading, subheading, children, footer }) => (
     </div>
 
     <div className="flex w-full flex-col items-center justify-center px-6 py-16 lg:w-1/2">
-      <Link to="/home" className="mb-10 text-lg font-semibold tracking-tight lg:hidden">
+      <Link to="/home" className="mb-10 text-lg font-bold tracking-tight lg:hidden">
         Verdiq
       </Link>
 
@@ -61,7 +61,7 @@ const AuthLayout = ({ heading, subheading, children, footer }) => (
         transition={{ duration: 0.5, ease: EASE }}
         className="w-full max-w-sm"
       >
-        <h1 className="text-2xl font-semibold tracking-tight">{heading}</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight">{heading}</h1>
         <p className="mt-1 text-sm text-neutral-500">{subheading}</p>
 
         {children}

@@ -149,7 +149,7 @@ const Dashboard = () => {
     <div className="flex h-screen bg-white text-black">
       <aside className="flex w-64 flex-col border-r border-neutral-200">
         <div className="border-b border-neutral-200 p-4">
-          <Link to="/home" className="text-lg font-semibold tracking-tight">
+          <Link to="/home" className="text-lg font-bold tracking-tight">
             Verdiq
           </Link>
           <button
@@ -322,7 +322,7 @@ const Dashboard = () => {
         <div className="scrollbar-hide flex-1 overflow-y-auto px-6 py-6">
           {messages.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
-              <h2 className="text-2xl font-semibold tracking-tight">Ask anything</h2>
+              <h2 className="text-2xl font-bold tracking-tight">Ask anything</h2>
               <p className="mt-2 max-w-sm text-sm text-neutral-500">
                 Start a new conversation — your question becomes the title of this chat.
               </p>

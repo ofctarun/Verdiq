@@ -366,7 +366,7 @@ const Home = () => {
           navHidden ? 'pointer-events-none' : ''
         }`}
       >
-        <Link to="/home" className="justify-self-start text-lg font-semibold tracking-tight">
+        <Link to="/home" className="justify-self-start text-lg font-bold tracking-tight">
           Verdiq
         </Link>
 
@@ -433,7 +433,7 @@ const Home = () => {
           className="pointer-events-none absolute -z-10 hidden h-[500px] w-[500px] rounded-full bg-black/[0.035] blur-3xl sm:block"
         />
 
-        <div className="relative z-10 mx-auto max-w-4xl text-center">
+        <div className="relative z-10 mx-auto max-w-7xl text-center">
           {!introLoading && (
           <motion.svg
             width="44"
@@ -467,21 +467,37 @@ const Home = () => {
             initial="hidden"
             animate="show"
             variants={heroContainer}
-            className="mt-6 flex flex-wrap justify-center gap-x-4 text-5xl font-semibold tracking-tight sm:text-7xl lg:text-8xl"
+            className="mt-6 flex flex-col items-center gap-y-1 text-5xl font-extrabold tracking-tight sm:text-7xl lg:text-8xl"
           >
-            {HERO_WORDS.map((word, i) => (
+            <div className="flex flex-wrap justify-center gap-x-4">
+              {HERO_WORDS.slice(0, 3).map((word) => (
+                <motion.span key={word} variants={fadeUp} transition={{ duration: 0.6, ease: EASE }}>
+                  {word}
+                </motion.span>
+              ))}
+            </div>
+            <div className="flex flex-wrap justify-center gap-x-4">
+              {HERO_WORDS.slice(3).map((word) => (
+                <motion.span
+                  key={word}
+                  variants={fadeUp}
+                  transition={{ duration: 0.6, ease: EASE }}
+                  className="text-neutral-400"
+                >
+                  {word}
+                </motion.span>
+              ))}
               <motion.span
-                key={word}
                 variants={fadeUp}
                 transition={{ duration: 0.6, ease: EASE }}
-                className={i >= 3 ? 'text-neutral-400' : ''}
+                className="relative inline-block text-left font-mono text-neutral-400"
               >
-                {word}
+                <span aria-hidden="true" className="invisible">
+                  {SCRAMBLE_WORD}
+                </span>
+                <span className="absolute inset-0">{scrambledLastWord}</span>
               </motion.span>
-            ))}
-            <motion.span variants={fadeUp} transition={{ duration: 0.6, ease: EASE }} className="text-neutral-400">
-              {scrambledLastWord}
-            </motion.span>
+            </div>
           </motion.h1>
           )}
 
@@ -541,7 +557,7 @@ const Home = () => {
             className="mx-auto max-w-2xl text-center"
           >
             <p className="text-sm font-medium tracking-[0.25em] text-neutral-400 uppercase">Capabilities</p>
-            <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
+            <h2 className="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
               One agent, five real tools
             </h2>
           </motion.div>
@@ -578,7 +594,7 @@ const Home = () => {
                 >
                   <span className="font-mono text-sm text-neutral-400">{String(i + 1).padStart(2, '0')}</span>
                   <div>
-                    <h3 className="text-2xl font-semibold tracking-tight sm:text-3xl">{capability.title}</h3>
+                    <h3 className="text-2xl font-bold tracking-tight sm:text-3xl">{capability.title}</h3>
                     <motion.p
                       initial={{ opacity: 0, y: 8 }}
                       whileInView={{ opacity: 1, y: 0 }}
@@ -659,7 +675,7 @@ const Home = () => {
         <div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-3xl border border-neutral-200 px-8 py-16 text-center sm:px-16 sm:py-20">
           <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_0%,rgba(0,0,0,0.05),transparent_70%)]" />
 
-          <h2 className="text-4xl font-semibold tracking-tight sm:text-6xl">Ready when you are</h2>
+          <h2 className="text-4xl font-extrabold tracking-tight sm:text-6xl">Ready when you are</h2>
           <p className="mx-auto mt-4 max-w-md text-lg text-neutral-500">
             No setup, no credit card. Ask your first question in under a minute.
           </p>
