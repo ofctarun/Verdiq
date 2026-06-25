@@ -8,26 +8,191 @@ import { useChat } from '../../chat/hooks/useChat'
 
 const CAPABILITIES = [
   {
+    icon: 'search',
     title: 'Web search',
     description: 'Pulls live results from the web when a question needs current information — not just what the model already knows.',
   },
   {
+    icon: 'github',
     title: 'GitHub repo health',
     description: 'Connect your GitHub account and ask about any repository: stars, issue close ratio, contributor count, last commit — computed in real time.',
   },
   {
+    icon: 'calculator',
     title: 'Calculator',
     description: 'Numeric questions get real computed answers, not LLM guesses — cost comparisons, ratios, sums, all evaluated precisely.',
   },
   {
+    icon: 'document',
     title: 'PDF context',
     description: 'Attach a PDF to any conversation and ask about it directly. The agent reads the document, not just your prompt.',
   },
   {
+    icon: 'persona',
     title: 'Custom persona',
     description: 'Set a system prompt per conversation to shape how the agent responds — terse, formal, expert-level, whatever fits.',
   },
 ]
+
+const CAPABILITY_ICON_PATHS = {
+  search: (
+    <>
+      <circle cx="11" cy="11" r="6" />
+      <path d="M16 16 L21 21" />
+    </>
+  ),
+  github: (
+    <>
+      <circle cx="6" cy="6" r="2.1" />
+      <circle cx="6" cy="18" r="2.1" />
+      <circle cx="18" cy="13" r="2.1" />
+      <path d="M6 8.1 V15.9" />
+      <path d="M8.1 6 H13 a3 3 0 0 1 3 3 v1.9" />
+    </>
+  ),
+  calculator: (
+    <>
+      <rect x="5" y="3" width="14" height="18" rx="2" />
+      <path d="M8 7 H16" />
+      <path d="M8 12 H8.01 M12 12 H12.01 M16 12 H16.01 M8 16 H8.01 M12 16 H12.01 M16 16 H16.01" strokeLinecap="round" />
+    </>
+  ),
+  document: (
+    <>
+      <path d="M7 3 H14 L18 7 V21 H7 Z" />
+      <path d="M14 3 V7 H18" />
+      <path d="M9.5 12 H14.5" />
+      <path d="M9.5 15.5 H14.5" />
+    </>
+  ),
+  persona: (
+    <>
+      <circle cx="12" cy="9" r="3.2" />
+      <path d="M6 19 c0 -3.5 2.8 -5.5 6 -5.5 s6 2 6 5.5" />
+    </>
+  ),
+}
+
+const CapabilityIcon = ({ icon, className = '' }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {CAPABILITY_ICON_PATHS[icon]}
+  </svg>
+)
+
+const WORKSPACE_THREADS = [
+  {
+    icon: 'github',
+    label: 'GitHub',
+    title: 'verdiq — repo health check',
+    question: 'How healthy is facebook/react right now?',
+    answer: 'Active and healthy: last commit 2 days ago, 94% of issues closed, 1,800+ contributors.',
+    live: true,
+  },
+  {
+    icon: 'search',
+    label: 'Web search',
+    title: 'verdiq — live research',
+    question: "What's the latest on the EU AI Act enforcement?",
+    answer: 'Prohibited-use rules took effect Feb 2025; general-purpose model obligations phase in August 2026.',
+  },
+  {
+    icon: 'calculator',
+    label: 'Calculator',
+    title: 'verdiq — computed, not guessed',
+    question: '$42,500 at 6% compounded annually for 3 years?',
+    answer: '$50,613.27 — computed directly, not estimated from training data.',
+  },
+  {
+    icon: 'document',
+    label: 'PDF context',
+    title: 'verdiq — reads your files',
+    question: 'Summarize the termination clause on page 4.',
+    answer: 'Either party may terminate with 30 days written notice; early termination fee waived after month 12.',
+  },
+]
+
+const WorkspaceCard = ({ thread, cardRef }) => (
+  <div
+    ref={cardRef}
+    className="flex w-75 shrink-0 flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-xl sm:w-95"
+  >
+    <div className="flex items-center gap-2 border-b border-neutral-200 px-4 py-3">
+      <span className="h-2.5 w-2.5 rounded-full bg-neutral-300" />
+      <span className="h-2.5 w-2.5 rounded-full bg-neutral-300" />
+      <span className="h-2.5 w-2.5 rounded-full bg-neutral-300" />
+      <span className="ml-2 truncate text-xs text-neutral-400">{thread.title}</span>
+    </div>
+    <div className="space-y-3 p-5 text-sm">
+      <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.7 }}
+        variants={bubbleReveal}
+        className="flex justify-end"
+      >
+        <p className="max-w-[85%] rounded-2xl bg-black px-4 py-2.5 text-white">{thread.question}</p>
+      </motion.div>
+      <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.7 }}
+        variants={bubbleReveal}
+        transition={{ delay: 0.25 }}
+        className="flex justify-start"
+      >
+        <div className="max-w-[90%]">
+          <span className="mb-1 inline-flex items-center gap-1 rounded-full border border-neutral-200 px-2 py-0.5 text-[10px] text-neutral-500">
+            <CapabilityIcon icon={thread.icon} className="h-3 w-3" />
+            {thread.label}
+          </span>
+          <p className="rounded-2xl border border-neutral-200 px-4 py-2.5 text-black">
+            {thread.answer}
+            {thread.live && (
+              <motion.span
+                animate={{ opacity: [1, 0, 1] }}
+                transition={{ repeat: Infinity, duration: 1.1 }}
+                className="ml-1 inline-block"
+              >
+                ▍
+              </motion.span>
+            )}
+          </p>
+        </div>
+      </motion.div>
+    </div>
+  </div>
+)
+
+const WorkspaceDot = ({ progress, index, total }) => {
+  const start = index / total
+  const mid = (index + 0.5) / total
+  const end = (index + 1) / total
+  const scale = useTransform(progress, [start, mid, end], [1, 1.7, 1])
+  const opacity = useTransform(progress, [start, mid, end], [0.3, 1, 0.3])
+  return <motion.span style={{ scale, opacity }} className="h-1.5 w-1.5 rounded-full bg-black" />
+}
+
+function useMediaQuery(query) {
+  const [matches, setMatches] = useState(() => typeof window !== 'undefined' && window.matchMedia(query).matches)
+
+  useEffect(() => {
+    const media = window.matchMedia(query)
+    const handleChange = (e) => setMatches(e.matches)
+    setMatches(media.matches)
+    media.addEventListener('change', handleChange)
+    return () => media.removeEventListener('change', handleChange)
+  }, [query])
+
+  return matches
+}
 
 const FOOTER_COLUMNS = [
   {
@@ -155,6 +320,31 @@ const heroContainer = {
 
 const EASE = [0.16, 1, 0.3, 1]
 
+const capabilityItem = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.1 } },
+}
+
+const capabilityIconReveal = {
+  hidden: { opacity: 0, scale: 0.6, rotate: -8 },
+  show: { opacity: 1, scale: 1, rotate: 0, transition: { duration: 0.5, ease: EASE } },
+}
+
+const capabilityTextReveal = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
+}
+
+const workspaceFadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
+}
+
+const bubbleReveal = {
+  hidden: { opacity: 0, y: 14, scale: 0.97 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: EASE } },
+}
+
 const FooterLink = ({ link }) =>
   link.external ? (
     <a
@@ -221,6 +411,9 @@ const Home = () => {
 
   const footerRef = useRef(null)
   const workspaceRef = useRef(null)
+  const workspaceTrackRef = useRef(null)
+  const firstThreadCardRef = useRef(null)
+  const lastThreadCardRef = useRef(null)
   const heroRef = useRef(null)
   const capabilitiesRef = useRef(null)
 
@@ -238,16 +431,53 @@ const Home = () => {
     spotY.set(e.clientY - rect.top)
   }
 
-  const { scrollYProgress: workspaceProgress } = useScroll({
-    target: workspaceRef,
-    offset: ['start 0.9', 'start 0.3'],
-  })
-  const mockRotate = useTransform(workspaceProgress, [0, 1], [18, 0])
-  const mockOpacity = useTransform(workspaceProgress, [0, 1], [0, 1])
-  const mockY = useTransform(workspaceProgress, [0, 1], [60, 0])
-
   const { scrollYProgress: capabilitiesProgress } = useScroll({ target: capabilitiesRef })
   const capabilitiesLine = useTransform(capabilitiesProgress, [0.1, 0.9], [0, 1])
+  const capabilitiesDotTop = useTransform(capabilitiesLine, (v) => `${v * 100}%`)
+
+  const isDesktop = useMediaQuery('(min-width: 768px)')
+  const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
+  const enablePin = isDesktop && !prefersReducedMotion
+
+  const { scrollYProgress: workspaceTrackProgress } = useScroll({
+    target: workspaceRef,
+    offset: ['start start', 'end end'],
+  })
+
+  // Measured in px so the first card starts centered in the viewport and the
+  // last card ends centered too — no left-aligned start, no overshoot past
+  // the last card that would leave dead space before the next section.
+  const [trackOffsets, setTrackOffsets] = useState({ start: 0, end: 0 })
+
+  useEffect(() => {
+    if (!enablePin) return
+
+    function measure() {
+      const first = firstThreadCardRef.current
+      const last = lastThreadCardRef.current
+      if (!first || !last) return
+
+      const viewportWidth = window.innerWidth
+      const firstCenter = first.offsetLeft + first.offsetWidth / 2
+      const lastCenter = last.offsetLeft + last.offsetWidth / 2
+
+      setTrackOffsets({
+        start: viewportWidth / 2 - firstCenter,
+        end: viewportWidth / 2 - lastCenter,
+      })
+    }
+
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [enablePin])
+
+  const trackX = useTransform(
+    workspaceTrackProgress,
+    (p) => trackOffsets.start + (trackOffsets.end - trackOffsets.start) * p
+  )
+  const workspaceHintOpacity = useTransform(workspaceTrackProgress, [0, 0.12], [1, 0])
+  const workspaceGlowY = useTransform(workspaceTrackProgress, [0, 1], [-40, 40])
 
   useEffect(() => {
     if (!introLoading) return
@@ -564,7 +794,7 @@ const Home = () => {
 
           <div className="relative mt-24">
             <svg
-              className="pointer-events-none absolute top-2 left-6 hidden h-[calc(100%-1rem)] w-px sm:block"
+              className="pointer-events-none absolute top-2 left-7 hidden h-[calc(100%-1rem)] w-px sm:block"
               viewBox="0 0 2 1000"
               preserveAspectRatio="none"
             >
@@ -581,25 +811,47 @@ const Home = () => {
                 style={{ pathLength: capabilitiesLine }}
               />
             </svg>
+            <motion.span
+              style={{ top: capabilitiesDotTop }}
+              className="pointer-events-none absolute left-7 hidden h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black shadow-[0_0_0_4px_white] sm:block"
+            />
 
-            <div className="space-y-16 sm:pl-16">
+            <div className="space-y-12 sm:pl-20">
               {CAPABILITIES.map((capability, i) => (
                 <motion.div
                   key={capability.title}
-                  initial={{ opacity: 0, x: -28 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, amount: 0.6 }}
-                  transition={{ duration: 0.6, ease: EASE }}
-                  className="flex flex-col gap-3 sm:flex-row sm:gap-8"
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true, amount: 0.5 }}
+                  variants={capabilityItem}
+                  className="group flex flex-col gap-4 rounded-2xl p-3 transition-colors sm:flex-row sm:items-start sm:gap-7 sm:p-4 sm:hover:bg-neutral-50"
                 >
-                  <span className="font-mono text-sm text-neutral-400">{String(i + 1).padStart(2, '0')}</span>
+                  <motion.div
+                    variants={capabilityIconReveal}
+                    initial={{ borderColor: '#e5e5e5', color: '#a3a3a3' }}
+                    whileInView={{ borderColor: '#000000', color: '#000000' }}
+                    viewport={{ amount: 0.6, once: false }}
+                    transition={{ duration: 0.4, ease: EASE }}
+                    className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border bg-white"
+                  >
+                    <CapabilityIcon icon={capability.icon} className="h-6 w-6" />
+                  </motion.div>
+
                   <div>
-                    <h3 className="text-2xl font-bold tracking-tight sm:text-3xl">{capability.title}</h3>
+                    <motion.span
+                      variants={capabilityTextReveal}
+                      className="font-mono text-xs tracking-widest text-neutral-400"
+                    >
+                      {String(i + 1).padStart(2, '0')}
+                    </motion.span>
+                    <motion.h3
+                      variants={capabilityTextReveal}
+                      className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl"
+                    >
+                      {capability.title}
+                    </motion.h3>
                     <motion.p
-                      initial={{ opacity: 0, y: 8 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.6 }}
-                      transition={{ duration: 0.5, delay: 0.15, ease: EASE }}
+                      variants={capabilityTextReveal}
                       className="mt-2 max-w-xl text-base text-neutral-500 sm:text-lg"
                     >
                       {capability.description}
@@ -615,54 +867,137 @@ const Home = () => {
       <section
         id="workspace"
         ref={workspaceRef}
-        className="flex min-h-screen flex-col items-center justify-center border-t border-neutral-200 bg-neutral-50 px-6 py-20 sm:px-10"
+        className={`relative border-t border-neutral-200 bg-neutral-50 ${enablePin ? 'h-[280vh]' : 'py-20'}`}
       >
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="text-sm font-medium tracking-[0.25em] text-neutral-400 uppercase">The workspace</p>
-          <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-            Every thread keeps its context
-          </h2>
-          <p className="mx-auto mt-6 max-w-xl text-lg text-neutral-600">
-            Follow up, branch off, come back tomorrow. Verdiq tracks the conversation, the tools
-            it used, and the documents you&apos;ve shared — so you never repeat yourself.
-          </p>
-        </div>
-
-        <motion.div
-          style={{ rotateX: mockRotate, opacity: mockOpacity, y: mockY, transformPerspective: 1000 }}
-          className="mx-auto mt-14 w-full max-w-2xl overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-2xl"
+        <div
+          className={
+            enablePin
+              ? 'sticky top-0 flex h-screen flex-col items-center justify-center overflow-hidden px-6 sm:px-10'
+              : 'relative flex flex-col items-center overflow-hidden px-6 sm:px-10'
+          }
         >
-          <div className="flex items-center gap-2 border-b border-neutral-200 px-4 py-3">
-            <span className="h-2.5 w-2.5 rounded-full bg-neutral-300" />
-            <span className="h-2.5 w-2.5 rounded-full bg-neutral-300" />
-            <span className="h-2.5 w-2.5 rounded-full bg-neutral-300" />
-            <span className="ml-2 text-xs text-neutral-400">verdiq — repo health check</span>
-          </div>
-          <div className="space-y-3 p-6 text-sm">
-            <div className="flex justify-end">
-              <p className="max-w-[80%] rounded-2xl bg-black px-4 py-2.5 text-white">
-                How healthy is facebook/react right now?
-              </p>
+          <motion.div
+            style={{ y: workspaceGlowY }}
+            className="pointer-events-none absolute top-1/2 left-1/2 -z-0 h-[36rem] w-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(0,0,0,0.05),transparent_70%)] blur-2xl"
+          />
+
+          {/* Artistic marks — decorative, monochrome, never interactive */}
+          <span className="pointer-events-none absolute top-[12%] left-[6%] hidden text-3xl text-neutral-200 md:block">
+            +
+          </span>
+          <span className="pointer-events-none absolute right-[9%] bottom-[16%] hidden text-3xl text-neutral-200 md:block">
+            +
+          </span>
+          {enablePin && (
+            <div className="pointer-events-none absolute top-[16%] right-[7%] hidden -rotate-3 flex-col items-end gap-1 md:flex">
+              <span className="rounded-full border border-neutral-300 bg-white px-3 py-1 font-mono text-[11px] tracking-wide text-neutral-500">
+                {WORKSPACE_THREADS.length} live tool calls
+              </span>
+              <svg width="70" height="46" viewBox="0 0 70 46" className="text-neutral-300">
+                <defs>
+                  <marker id="workspaceArrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                    <path d="M0,0 L8,4 L0,8 Z" fill="currentColor" />
+                  </marker>
+                </defs>
+                <path
+                  d="M64 4 C 40 4, 18 16, 6 42"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.3"
+                  strokeDasharray="3 4"
+                  markerEnd="url(#workspaceArrow)"
+                />
+              </svg>
             </div>
-            <div className="flex justify-start">
-              <div className="max-w-[85%]">
-                <span className="mb-1 inline-block rounded-full border border-neutral-200 px-2 py-0.5 text-[10px] text-neutral-500">
-                  🐙 GitHub
-                </span>
-                <p className="rounded-2xl border border-neutral-200 px-4 py-2.5 text-black">
-                  Active and healthy: last commit 2 days ago, 94% of issues closed, 1,800+ contributors.
-                  <motion.span
-                    animate={{ opacity: [1, 0, 1] }}
-                    transition={{ repeat: Infinity, duration: 1.1 }}
-                    className="ml-1 inline-block"
-                  >
-                    ▍
-                  </motion.span>
-                </p>
+          )}
+
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.6 }}
+            variants={capabilityItem}
+            className="relative z-10 mx-auto max-w-3xl text-center"
+          >
+            <motion.p
+              variants={workspaceFadeUp}
+              className="relative inline-block text-sm font-medium tracking-[0.25em] text-neutral-400 uppercase"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                className="pointer-events-none absolute top-1/2 -left-7 hidden h-4 w-4 -translate-y-1/2 rotate-12 text-neutral-300 sm:block"
+              >
+                <path d="M12 2 V22 M4 7 L20 17 M20 7 L4 17" />
+              </svg>
+              The workspace
+            </motion.p>
+            <motion.h2
+              variants={workspaceFadeUp}
+              className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl"
+            >
+              Every thread keeps its context
+            </motion.h2>
+            <motion.p variants={workspaceFadeUp} className="mx-auto mt-6 max-w-xl text-lg text-neutral-600">
+              Follow up, branch off, come back tomorrow. Verdiq tracks the conversation, the tools
+              it used, and the documents you&apos;ve shared — so you never repeat yourself.
+            </motion.p>
+          </motion.div>
+
+          {enablePin ? (
+            <>
+              <motion.div ref={workspaceTrackRef} style={{ x: trackX }} className="relative z-10 mt-14 flex gap-8">
+                {WORKSPACE_THREADS.map((thread, i) => (
+                  <WorkspaceCard
+                    key={thread.title}
+                    thread={thread}
+                    cardRef={
+                      i === 0
+                        ? firstThreadCardRef
+                        : i === WORKSPACE_THREADS.length - 1
+                          ? lastThreadCardRef
+                          : undefined
+                    }
+                  />
+                ))}
+              </motion.div>
+
+              <div className="relative z-10 mt-8 flex items-center gap-2">
+                {WORKSPACE_THREADS.map((thread, i) => (
+                  <WorkspaceDot
+                    key={thread.title}
+                    progress={workspaceTrackProgress}
+                    index={i}
+                    total={WORKSPACE_THREADS.length}
+                  />
+                ))}
               </div>
+
+              <motion.div
+                style={{ opacity: workspaceHintOpacity }}
+                className="pointer-events-none absolute bottom-10 left-1/2 hidden -translate-x-1/2 items-center gap-2 rounded-full border border-neutral-300 bg-white px-4 py-2 font-mono text-xs tracking-wide text-neutral-500 md:flex"
+              >
+                <motion.span
+                  animate={{ x: [0, 6, 0] }}
+                  transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  →
+                </motion.span>
+                scroll to explore threads
+              </motion.div>
+            </>
+          ) : (
+            <div className="relative z-10 mt-12 flex w-full snap-x snap-mandatory gap-5 overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {WORKSPACE_THREADS.map((thread) => (
+                <div key={thread.title} className="snap-center">
+                  <WorkspaceCard thread={thread} />
+                </div>
+              ))}
             </div>
-          </div>
-        </motion.div>
+          )}
+        </div>
       </section>
 
       <motion.section
