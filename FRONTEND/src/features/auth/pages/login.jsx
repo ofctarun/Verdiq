@@ -13,7 +13,7 @@ const fieldVariants = {
 }
 
 const Login = () => {
-  const [form, setForm] = useState({ email: '', password: '' })
+  const [form, setForm] = useState({ email: 'user@gmail.com', password: 'user@123' })
   const { loading, error, handleLogin } = useAuth()
   const navigate = useNavigate()
 
