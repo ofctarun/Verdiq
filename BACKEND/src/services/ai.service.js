@@ -9,12 +9,12 @@ import userModel from "../models/user.model.js";
 import { decrypt } from "../utils/crypto.util.js";
 
 const mistralModel = new ChatMistralAI({
-    model: "mistral-medium-latest",
+    model: "open-mistral-nemo",
     apiKey: process.env.MISTRAL_API_KEY
 })
 
 const titleModel = new ChatMistralAI({
-    model: "mistral-medium-latest",
+    model: "open-mistral-nemo",
     apiKey: process.env.MISTRAL_API_KEY,
     maxTokens: 20,
 })
